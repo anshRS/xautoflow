@@ -1,3 +1,4 @@
+import 'package:client/features/auth/presentation/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,10 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'XAgent',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const Scaffold(),
+      home: const SignUpScreen(),
     );
   }
 }
