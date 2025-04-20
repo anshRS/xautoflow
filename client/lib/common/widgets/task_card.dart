@@ -29,7 +29,7 @@ class TaskCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _buildTaskTypeChip(theme),
+                  _buildTaskTypeChip(),
                   const Spacer(),
                   _buildStatusChip(theme),
                 ],
@@ -85,32 +85,56 @@ class TaskCard extends StatelessWidget {
     );
   }
 
-  Widget _buildTaskTypeChip(ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: _getTaskTypeColor(theme).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            _getTaskTypeIcon(),
-            size: 16,
-            color: _getTaskTypeColor(theme),
-          ),
-          const SizedBox(width: 4),
-          Text(
-            task.type.name,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: _getTaskTypeColor(theme),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
+  Widget _buildTaskTypeChip() {
+    return Chip(
+      label: Text(_getTaskTypeName(task.taskType)),
+      backgroundColor: _getTaskTypeColor(),
+      labelStyle: const TextStyle(fontSize: 12),
     );
+  }
+
+  String _getTaskTypeName(TaskType type) {
+    switch (type) {
+      case TaskType.research:
+        return 'Research';
+      case TaskType.strategyDev:
+        return 'Strategy Dev';
+      case TaskType.backtest:
+        return 'Backtest';
+    }
+  }
+
+  Color _getTaskTypeColor() {
+    switch (task.taskType) {
+      case TaskType.research:
+        return Colors.blue.shade100;
+      case TaskType.strategyDev:
+        return Colors.green.shade100;
+      case TaskType.backtest:
+        return Colors.orange.shade100;
+    }
+  }
+
+  Color _getTaskTypeIconColor() {
+    switch (task.taskType) {
+      case TaskType.research:
+        return Colors.blue;
+      case TaskType.strategyDev:
+        return Colors.green;
+      case TaskType.backtest:
+        return Colors.orange;
+    }
+  }
+
+  IconData _getTaskTypeIcon() {
+    switch (task.taskType) {
+      case TaskType.research:
+        return Icons.search;
+      case TaskType.strategyDev:
+        return Icons.trending_up;
+      case TaskType.backtest:
+        return Icons.history;
+    }
   }
 
   Widget _buildStatusChip(ThemeData theme) {
@@ -120,54 +144,54 @@ class TaskCard extends StatelessWidget {
         color: _getStatusColor(theme).withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(
-        task.status.name,
-        style: theme.textTheme.bodySmall?.copyWith(
-          color: _getStatusColor(theme),
-          fontWeight: FontWeight.w500,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            _getStatusIcon(),
+            size: 16,
+            color: _getStatusColor(theme),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            task.status.name,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: _getStatusColor(theme),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Color _getTaskTypeColor(ThemeData theme) {
-    switch (task.type) {
-      case TaskType.research:
-        return theme.colorScheme.primary;
-      case TaskType.strategy:
-        return theme.colorScheme.secondary;
-      case TaskType.backtest:
-        return theme.colorScheme.tertiary;
-      default:
-        return theme.colorScheme.primary;
-    }
-  }
-
-  IconData _getTaskTypeIcon() {
-    switch (task.type) {
-      case TaskType.research:
-        return Icons.search;
-      case TaskType.strategy:
-        return Icons.analytics;
-      case TaskType.backtest:
-        return Icons.history;
-      default:
-        return Icons.task;
-    }
-  }
-
   Color _getStatusColor(ThemeData theme) {
     switch (task.status) {
-      case TaskStatus.pending:
-        return theme.colorScheme.primary;
-      case TaskStatus.inProgress:
-        return theme.colorScheme.secondary;
+      case TaskStatus.planning:
+        return Colors.grey;
+      case TaskStatus.pendingApproval:
+        return Colors.orange;
+      case TaskStatus.running:
+        return Colors.blue;
       case TaskStatus.completed:
-        return theme.colorScheme.tertiary;
+        return Colors.green;
       case TaskStatus.failed:
-        return theme.colorScheme.error;
-      default:
-        return theme.colorScheme.primary;
+        return Colors.red;
+    }
+  }
+
+  IconData _getStatusIcon() {
+    switch (task.status) {
+      case TaskStatus.planning:
+        return Icons.edit;
+      case TaskStatus.pendingApproval:
+        return Icons.pending;
+      case TaskStatus.running:
+        return Icons.play_arrow;
+      case TaskStatus.completed:
+        return Icons.check;
+      case TaskStatus.failed:
+        return Icons.error;
     }
   }
 } 

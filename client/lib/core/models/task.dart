@@ -28,6 +28,8 @@ enum TaskStatus {
 @JsonSerializable()
 class Task {
   final String id;
+  final String title;
+  final String? description;
   final TaskType taskType;
   final TaskStatus status;
   final Map<String, dynamic> inputData;
@@ -36,9 +38,12 @@ class Task {
   final String? errorDetails;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final DateTime? dueDate;
 
   Task({
     required this.id,
+    required this.title,
+    this.description,
     required this.taskType,
     required this.status,
     required this.inputData,
@@ -47,6 +52,7 @@ class Task {
     this.errorDetails,
     required this.createdAt,
     required this.updatedAt,
+    this.dueDate,
   });
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
@@ -54,6 +60,8 @@ class Task {
 
   Task copyWith({
     String? id,
+    String? title,
+    String? description,
     TaskType? taskType,
     TaskStatus? status,
     Map<String, dynamic>? inputData,
@@ -62,9 +70,12 @@ class Task {
     String? errorDetails,
     DateTime? createdAt,
     DateTime? updatedAt,
+    DateTime? dueDate,
   }) {
     return Task(
       id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
       taskType: taskType ?? this.taskType,
       status: status ?? this.status,
       inputData: inputData ?? this.inputData,
@@ -73,18 +84,25 @@ class Task {
       errorDetails: errorDetails ?? this.errorDetails,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      dueDate: dueDate ?? this.dueDate,
     );
   }
 }
 
 @JsonSerializable()
 class TaskCreate {
+  final String title;
+  final String? description;
   final TaskType taskType;
   final Map<String, dynamic> inputData;
+  final DateTime? dueDate;
 
   TaskCreate({
+    required this.title,
+    this.description,
     required this.taskType,
     required this.inputData,
+    this.dueDate,
   });
 
   factory TaskCreate.fromJson(Map<String, dynamic> json) => _$TaskCreateFromJson(json);

@@ -30,7 +30,7 @@ class StrategyWorkflow:
             )
             state["current_plan"] = plan_result["plan"]
             
-            crud_task.update_task_plan(
+            await crud_task.update_task_plan(
                 db=self.db_session,
                 task_id=self.task_id,
                 plan=plan_result["plan"]
@@ -50,6 +50,12 @@ class StrategyWorkflow:
                     "step": "fetch_market_data",
                     "error": str(e)
                 }
+                await crud_task.update_task_status(
+                    db=self.db_session,
+                    task_id=self.task_id,
+                    status=TaskStatus.FAILED,
+                    error_details=state["error_info"]
+                )
             return state
 
         @workflow.node()

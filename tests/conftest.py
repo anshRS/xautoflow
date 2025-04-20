@@ -1,8 +1,7 @@
 import pytest
 from typing import Generator, AsyncGenerator
 from fastapi.testclient import TestClient
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from app.core.config import settings
 from app.db.base import Base
 from app.main import app
@@ -28,7 +27,7 @@ async def test_db_setup(test_engine):
 
 @pytest.fixture
 async def db_session(test_engine, test_db_setup) -> AsyncGenerator[AsyncSession, None]:
-    async_session = sessionmaker(
+    async_session = async_sessionmaker(
         test_engine, class_=AsyncSession, expire_on_commit=False
     )
     async with async_session() as session:

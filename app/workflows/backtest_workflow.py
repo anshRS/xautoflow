@@ -30,7 +30,7 @@ class BacktestWorkflow:
             )
             state["current_plan"] = plan_result["plan"]
             
-            crud_task.update_task_plan(
+            await crud_task.update_task_plan(
                 db=self.db_session,
                 task_id=self.task_id,
                 plan=plan_result["plan"]

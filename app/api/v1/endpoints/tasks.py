@@ -1,48 +1,51 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from datetime import datetime
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
-from app.schemas.task import TaskCreate, TaskRead, PlanApproval
-from app.models.task import TaskStatus
+from app.schemas.task import TaskCreate, TaskSchema, PlanApproval, TaskFilter, TaskList
+from app.models.task import TaskStatus, TaskType
 from app.crud import crud_task
+from app.core.security import verify_api_key
+from app.services.task_service import TaskService
 
 router = APIRouter()
 
-@router.post("/", response_model=TaskRead)
+@router.post("/", response_model=TaskSchema)
 async def create_task(
     task: TaskCreate,
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key)
 ):
     service = TaskService(db)
     task_id = await service.start_task(task)
-    return crud_task.get_task(db, task_id)
+    return await crud_task.get_task(db, task_id)
 
-@router.put("/{task_id}/approve", response_model=TaskRead)
+@router.put("/{task_id}/approve", response_model=TaskSchema)
 async def approve_task_plan(
     task_id: UUID,
     approval: PlanApproval,
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key)
 ):
     service = TaskService(db)
     await service.approve_task_plan(task_id, approval)
-    return crud_task.get_task(db, task_id)
+    return await crud_task.get_task(db, task_id)
 
-@router.get("/{task_id}", response_model=TaskRead)
-def get_task(
+@router.get("/{task_id}", response_model=TaskSchema)
+async def get_task(
     task_id: UUID,
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key)
 ):
-    task = crud_task.get_task(db, task_id)
+    task = await crud_task.get_task(db, task_id)
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     return task
 
-from fastapi import Depends, Query
-from app.core.security import verify_api_key
-
-@router.get("/", response_model=List[TaskRead])
+@router.get("/", response_model=TaskList)
 async def list_tasks(
     task_types: List[TaskType] = Query(None),
     statuses: List[TaskStatus] = Query(None),
@@ -50,7 +53,7 @@ async def list_tasks(
     end_date: Optional[datetime] = None,
     skip: int = 0,
     limit: int = 100,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     _: str = Depends(verify_api_key)
 ):
     filter_params = TaskFilter(
@@ -59,12 +62,6 @@ async def list_tasks(
         start_date=start_date,
         end_date=end_date
     )
-    return crud_task.list_tasks_filtered(db, filter_params, skip, limit)
-
-@router.post("/", response_model=TaskRead)
-async def create_task(
-    task: TaskCreate,
-    db: Session = Depends(get_db),
-    _: str = Depends(verify_api_key)
-):
-    return await TaskService(db).start_task(task)
+    tasks = await crud_task.list_tasks_filtered(db, filter_params, skip, limit)
+    total = len(tasks)  # In a real app, you'd want to do a separate count query
+    return TaskList(items=tasks, total=total)

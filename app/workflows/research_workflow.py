@@ -31,7 +31,7 @@ class ResearchWorkflow:
             )
             state["current_plan"] = plan_result["plan"]
             
-            crud_task.update_task_plan(
+            await crud_task.update_task_plan(
                 db=self.db_session,
                 task_id=self.task_id,
                 plan=plan_result["plan"]
@@ -65,7 +65,7 @@ class ResearchWorkflow:
         @workflow.node()
         async def finalize_research(state: WorkflowState) -> WorkflowState:
             if state.get("error_info"):
-                crud_task.update_task_status(
+                await crud_task.update_task_status(
                     db=self.db_session,
                     task_id=self.task_id,
                     status=TaskStatus.FAILED,
@@ -81,7 +81,7 @@ class ResearchWorkflow:
                 "detailed_results": state["intermediate_results"]
             }
             
-            crud_task.update_task_status(
+            await crud_task.update_task_status(
                 db=self.db_session,
                 task_id=self.task_id,
                 status=TaskStatus.COMPLETED,

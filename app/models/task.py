@@ -1,37 +1,43 @@
-from enum import Enum as PyEnum
-import uuid
-from sqlalchemy import Column, String, JSON, Text, DateTime, Enum
-from sqlalchemy.dialects.postgresql import UUID, JSONB
 from datetime import datetime
-from app.db.session import Base
+from enum import Enum
+from typing import Optional
+from uuid import UUID, uuid4
+from sqlalchemy import Column, DateTime, Enum as SQLEnum, JSON, String, ForeignKey, Integer
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
+from sqlalchemy.orm import relationship
 
-class TaskType(str, PyEnum):
+from app.models.base import Base
+
+class TaskType(str, Enum):
     RESEARCH = "RESEARCH"
     STRATEGY_DEV = "STRATEGY_DEV"
     BACKTEST = "BACKTEST"
 
-class TaskStatus(str, PyEnum):
-    PLANNING = "PLANNING"
-    PENDING_APPROVAL = "PENDING_APPROVAL"
-    RUNNING = "RUNNING"
-    COMPLETED = "COMPLETED"
-    FAILED = "FAILED"
+class TaskStatus(str, Enum):
+    PLANNING = "planning"
+    PENDING_APPROVAL = "pending_approval"
+    APPROVED = "approved"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
 
 class Task(Base):
     __tablename__ = "tasks"
+    __table_args__ = {'extend_existing': True}
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    task_type = Column(Enum(TaskType), nullable=False)
-    status = Column(Enum(TaskStatus), nullable=False, default=TaskStatus.PLANNING)
-    input_data = Column(JSONB, nullable=False)
-    generated_plan = Column(JSONB)
-    result = Column(JSONB)
-    metadata = Column(JSONB, default={})
-    
-    __table_args__ = (
-        Index('idx_task_type_status', 'task_type', 'status'),
-        Index('idx_created_at', 'created_at'),
-    )
-    error_details = Column(Text)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    id = Column(PGUUID, primary_key=True, default=uuid4)
+    workflow_id = Column(Integer, ForeignKey("workflows.id"), nullable=True)
+    task_type = Column(SQLEnum(TaskType), nullable=False)
+    status = Column(SQLEnum(TaskStatus), nullable=False, default=TaskStatus.PLANNING)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    input_data = Column(JSON, nullable=True)
+    plan = Column(JSON, nullable=True)
+    output_data = Column(JSON, nullable=True)
+    error_details = Column(String, nullable=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    completed_at = Column(DateTime, nullable=True)
+
+    workflow = relationship("Workflow", back_populates="tasks")

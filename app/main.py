@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.api import api_router
 from app.core.config import settings
 from app.core.logging import setup_logging
+from app.db.session import engine, Base
 
 app = FastAPI(title="XAutoFlow API")
 
@@ -25,16 +26,14 @@ app.include_router(api_router, prefix="/api/v1")
 @app.on_event("startup")
 async def startup_event():
     # Initialize BM25 retriever
-    from app.core.indexing import build_bm25_retriever
-    build_bm25_retriever(force_rebuild=True)
+    from app.core.indexing import get_bm25_retriever
+    get_bm25_retriever()  # No force_rebuild parameter needed since we use lru_cache
     
-    # Verify database connection
-    from app.db.session import engine
-    from app.db.base import Base
-    Base.metadata.create_all(bind=engine)
+    # Create database tables
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 @app.on_event("shutdown")
 async def shutdown_event():
     # Close any open connections
-    from app.db.session import engine
-    engine.dispose()
+    await engine.dispose()

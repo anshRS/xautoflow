@@ -3,68 +3,49 @@ import logging
 from typing import Optional, List, Dict, Any
 from pathlib import Path
 from functools import lru_cache
+import glob
 
-from llama_index.core import (
-    SimpleDirectoryReader,
-    Document,
-    StorageContext,
-    Settings
-)
-from llama_index.core.node_parser import SentenceSplitter
-from llama_index.core.retrievers import BM25Retriever
-from llama_index.core.schema import TextNode
+from langchain_community.retrievers import BM25Retriever
+from langchain_community.document_loaders import TextLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-# Cache the retriever to avoid rebuilding it unnecessarily
 @lru_cache(maxsize=1)
-def build_bm25_retriever(force_rebuild: bool = False) -> BM25Retriever:
+def get_bm25_retriever() -> BM25Retriever:
     """
-    Build a BM25 retriever for the local knowledge base.
-    
-    Args:
-        force_rebuild: If True, rebuild the retriever even if it's cached
-        
-    Returns:
-        BM25Retriever: The configured BM25 retriever
+    Get or create a BM25 retriever for the local knowledge base.
+    Uses lru_cache to avoid rebuilding the retriever unnecessarily.
     """
     logger.info("Building BM25 retriever")
     
     # Load documents from the configured directory
     documents = load_documents()
     
-    # Parse documents into nodes
-    parser = SentenceSplitter(chunk_size=512, chunk_overlap=50)
-    nodes = []
-    
-    for doc in documents:
-        doc_nodes = parser.get_nodes_from_documents([doc])
-        nodes.extend(doc_nodes)
-    
-    # Create a simple storage context
-    storage_context = StorageContext.from_defaults()
-    
-    # Add nodes to the storage context
-    for node in nodes:
-        storage_context.docstore.add_documents([node])
+    # Split documents into chunks
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=512,
+        chunk_overlap=50
+    )
+    splits = text_splitter.split_documents(documents)
     
     # Create and configure the BM25 retriever
-    retriever = BM25Retriever.from_defaults(
-        docstore=storage_context.docstore,
-        similarity_top_k=5
+    retriever = BM25Retriever.from_documents(
+        documents=splits,
+        k=5
     )
     
-    logger.info(f"BM25 retriever built with {len(nodes)} nodes")
+    logger.info(f"BM25 retriever built with {len(splits)} documents")
     return retriever
 
-def load_documents() -> List[Document]:
+def load_documents() -> List[Any]:
     """
     Load documents from the configured knowledge base directory.
     
     Returns:
-        List[Document]: List of loaded documents
+        List[Any]: List of loaded documents
     """
     kb_path = settings.LOCAL_KB_PATH
     
@@ -74,8 +55,16 @@ def load_documents() -> List[Document]:
         return []
     
     logger.info(f"Loading documents from {kb_path}")
-    reader = SimpleDirectoryReader(kb_path)
-    documents = reader.load_data()
+    documents = []
+    
+    # Load all text files in the directory
+    for file_path in glob.glob(os.path.join(kb_path, "*.txt")):
+        try:
+            loader = TextLoader(file_path)
+            documents.extend(loader.load())
+        except Exception as e:
+            logger.error(f"Error loading file {file_path}: {str(e)}")
+    
     logger.info(f"Loaded {len(documents)} documents")
     return documents
 
@@ -90,9 +79,9 @@ async def query_local_kb(query: str, top_k: int = 5) -> str:
     Returns:
         str: Concatenated context from retrieved documents
     """
-    retriever = build_bm25_retriever()
-    nodes = retriever.retrieve(query)
+    retriever = get_bm25_retriever()
+    docs = retriever.get_relevant_documents(query)
     
-    # Extract and concatenate the content from the nodes
-    context = "\n\n".join([node.text for node in nodes[:top_k]])
+    # Extract and concatenate the content from the documents
+    context = "\n\n".join([doc.page_content for doc in docs[:top_k]])
     return context 

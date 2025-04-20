@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud import crud_task
 from app.models.task import TaskStatus, TaskType
 from app.schemas.task import TaskCreate, PlanApproval
@@ -11,12 +11,12 @@ from app.workflows.backtest_workflow import BacktestWorkflow
 from app.workflows.state import WorkflowState
 
 class TaskService:
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self.db = db
 
     async def start_task(self, task_create: TaskCreate) -> UUID:
         # Create task in DB
-        task = crud_task.create_task(self.db, task_create)
+        task = await crud_task.create_task(self.db, task_create)
         
         # Initialize workflow state
         initial_state = WorkflowState(
@@ -46,7 +46,7 @@ class TaskService:
             
             await workflow.execute(initial_state)
         except Exception as e:
-            crud_task.update_task_status(
+            await crud_task.update_task_status(
                 self.db,
                 task.id,
                 TaskStatus.FAILED,
@@ -61,7 +61,7 @@ class TaskService:
         task_id: UUID,
         approval: PlanApproval
     ) -> None:
-        task = crud_task.get_task(self.db, task_id)
+        task = await crud_task.get_task(self.db, task_id)
         if not task:
             raise HTTPException(404, "Task not found")
             
@@ -70,12 +70,12 @@ class TaskService:
 
         if approval.approved:
             if approval.modified_plan:
-                crud_task.update_task_plan(
+                await crud_task.update_task_plan(
                     self.db,
                     task_id,
                     approval.modified_plan
                 )
-            crud_task.update_task_status(
+            await crud_task.update_task_status(
                 self.db,
                 task_id,
                 TaskStatus.RUNNING
@@ -99,7 +99,7 @@ class TaskService:
                 )
                 await workflow.execute(state)
             except Exception as e:
-                crud_task.update_task_status(
+                await crud_task.update_task_status(
                     self.db,
                     task_id,
                     TaskStatus.FAILED,
@@ -107,7 +107,7 @@ class TaskService:
                 )
                 raise HTTPException(500, f"Workflow execution failed: {str(e)}")
         else:
-            crud_task.update_task_status(
+            await crud_task.update_task_status(
                 self.db,
                 task_id,
                 TaskStatus.PLANNING
