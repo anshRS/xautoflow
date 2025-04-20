@@ -1,6 +1,19 @@
-from supabase import create_client, Client
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
 from server.settings import settings
 
-# Initialize Supabase client. The entrypoint to the 
-# Supabase functionality and Supabase ecosystem
-supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+# Create async engine
+engine = create_async_engine(settings.DATABASE_URL, echo=True)
+
+# Create async session factory
+async_session = sessionmaker(
+    engine, class_=AsyncSession, expire_on_commit=False
+)
+
+async def get_db() -> AsyncSession:
+    """Dependency for getting async database sessions."""
+    async with async_session() as session:
+        try:
+            yield session
+        finally:
+            await session.close()

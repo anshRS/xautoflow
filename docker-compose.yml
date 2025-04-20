@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/xautoflow
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - API_KEY=${API_KEY}
+      - EXTERNAL_MARKET_DATA_API_URL=${EXTERNAL_MARKET_DATA_API_URL}
+      - EXTERNAL_MARKET_DATA_API_KEY=${EXTERNAL_MARKET_DATA_API_KEY}
+      - EXTERNAL_NEWS_API_URL=${EXTERNAL_NEWS_API_URL}
+      - EXTERNAL_NEWS_API_KEY=${EXTERNAL_NEWS_API_KEY}
+    volumes:
+      - ./local_kb:/app/local_kb
+      - ./.cache:/app/.cache
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=xautoflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
