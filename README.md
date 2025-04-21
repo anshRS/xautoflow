@@ -1,4 +1,4 @@
-# FinSight Agent
+# xautoflow
 
 A powerful AI-driven financial analysis platform that enables users to research financial assets, generate and execute trading strategies, and perform backtesting.
 
