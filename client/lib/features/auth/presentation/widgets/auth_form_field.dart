@@ -5,6 +5,7 @@ class AuthFormField extends StatelessWidget {
   final String hintText;
   final bool isHidden;
   final Icon icon;
+  final FormFieldValidator<String>? validator;
 
   final TextEditingController controller;
 
@@ -14,7 +15,8 @@ class AuthFormField extends StatelessWidget {
     required this.hintText,
     required this.isHidden,
     required this.icon,
-    required this.controller,
+    required this.controller, 
+    this.validator,
   });
 
   @override
@@ -29,12 +31,7 @@ class AuthFormField extends StatelessWidget {
         floatingLabelBehavior: FloatingLabelBehavior.always,
       ),
       obscureText: isHidden,
-      validator: (value) {
-        if(value!.isEmpty) {
-          return "$label is a mandatory field";
-        }
-        return null;
-      },
+      validator: validator,
     );
   }
 }
