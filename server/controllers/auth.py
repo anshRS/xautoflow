@@ -15,11 +15,6 @@ def register_user(data: UserCreate):
                 "email_redirect_to": settings.REDIRECT_URL
             }
         })
-
-        return JSONResponse(
-            status_code=status.HTTP_201_CREATED,
-            content={"detail": "User created successfully"}
-        )
     except Exception as e:
         raise BadRequestException(str(e))
 
@@ -28,8 +23,7 @@ def login_user(data: UserLogin):
         response = supabase.auth.sign_in_with_password({
             "email": data.email,
             "password": data.password
-        })        
-
+        }) 
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content={

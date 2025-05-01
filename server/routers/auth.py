@@ -5,7 +5,7 @@ from server.dependencies.auth import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
-@router.post("/register")
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 def register(req: UserCreate):
     return register_user(req)
 

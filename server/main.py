@@ -9,6 +9,6 @@ app.include_router(auth.router)
 def root():
     return {"message": "Server Running"}
 
-@app.get("/welcome")
+@app.get("/verify")
 def welcome():
     return {"message": "Email verified successfully. Welcome!"}
