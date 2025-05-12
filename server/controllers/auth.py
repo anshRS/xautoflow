@@ -20,19 +20,37 @@ def register_user(data: UserCreate):
 
 def login_user(data: UserLogin):
     try:
-        response = supabase.auth.sign_in_with_password({
+        data = supabase.auth.sign_in_with_password({
             "email": data.email,
             "password": data.password
         }) 
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={
-                "access_token": response.session.access_token, 
-                "id": response.user.id,
-                "name": response.user.user_metadata["name"],
-                "email": response.user.email,
-            }
-        )
+
+        response = (
+            supabase.table("profiles")
+            .select("*")
+            .eq("id", data.user.id)
+            .limit(1)
+            .single()
+            .execute()
+        )        
+
+        response.data["access_token"] = data.session.access_token
+        return response
     except Exception as e:
         raise BadRequestException(str(e))
-    
+
+def get_user(user):
+    try:
+        response = (
+            supabase.table("profiles")
+            .select("*")
+            .eq("id", user["sub"])
+            .limit(1)
+            .single()
+            .execute()
+        )
+                
+        return response
+    except Exception as e:
+        raise BadRequestException(str(e))
+            
