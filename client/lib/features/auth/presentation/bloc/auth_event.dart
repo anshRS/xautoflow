@@ -19,3 +19,12 @@ final class AuthLoginEvent extends AuthEvent {
 
   AuthLoginEvent({required this.email, required this.password});  
 }
+
+// User Login Event
+final class AuthIsUserLoggedIn extends AuthEvent {}
+
+// User Logout Event
+final class AuthLogoutEvent extends AuthEvent {}
+
+// Loading Event
+final class AuthStopLoadingEvent extends AuthEvent {}
