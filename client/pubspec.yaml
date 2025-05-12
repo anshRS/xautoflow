@@ -38,6 +38,8 @@ dependencies:
   fpdart: ^1.1.1
   http: ^1.3.0
   get_it: ^8.0.3
+  shared_preferences: ^2.5.0
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
