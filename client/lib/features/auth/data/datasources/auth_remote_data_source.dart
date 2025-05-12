@@ -11,4 +11,6 @@ abstract interface class AuthRemoteDataSource {
     required String email,
     required String password,
   });
+
+  Future<UserModel> getCurrentUser(String token);
 }

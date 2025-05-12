@@ -34,9 +34,28 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'password': password,
       });
 
-      return UserModel.fromJson(response!);
+      return UserModel.fromJson(response!["data"]);
     } catch (e) {
       rethrow;
     }
+  }
+  
+  @override
+  Future<UserModel> getCurrentUser(String token) async {
+    try {
+      final response = await HttpHelper.get(
+        'auth',
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        }
+      );
+      
+      return UserModel.fromJson(response!["data"]).copyWith(
+        token: token,
+      );
+    } catch (e) {
+      rethrow;      
+    }    
   }
 }
