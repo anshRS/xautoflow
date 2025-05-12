@@ -2,12 +2,13 @@ import 'package:client/bindings/dependencies.dart';
 import 'package:client/common/cubits/app_user/app_user_cubit.dart';
 import 'package:client/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:client/features/auth/presentation/screens/login_screen.dart';
+import 'package:client/features/home/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  initDependencies();
+  await initDependencies();
 
   runApp(
     MultiBlocProvider(
@@ -32,6 +33,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    context.read<AuthBloc>().add(AuthIsUserLoggedIn());
   }
 
   @override
@@ -44,7 +46,7 @@ class _MyAppState extends State<MyApp> {
         },
         builder: (context, state) {
           if (state) {
-            return const Scaffold(body: Center(child: Text('Logged in!')));
+            return const HomeScreen();
           }
           return const LogInScreen();
         },

@@ -8,8 +8,14 @@ class HttpHelper {
   static const String _baseUrl = 'http://10.0.2.2:8000';
 
   // GET http method
-  static Future<Map<String, dynamic>?> get(String endpoint) async {
-    final response = await http.get(Uri.parse('$_baseUrl/$endpoint'));
+  static Future<Map<String, dynamic>?> get(
+    String endpoint, {
+    Map<String, String>? headers,
+  }) async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/$endpoint'),
+      headers: headers,
+    );
     return _responseHandler(response);
   }
 
@@ -27,7 +33,10 @@ class HttpHelper {
   }
 
   // PUT http method
-  static Future<Map<String, dynamic>?> put(String endpoint, dynamic data) async {
+  static Future<Map<String, dynamic>?> put(
+    String endpoint,
+    dynamic data,
+  ) async {
     final response = await http.put(
       Uri.parse('$_baseUrl/$endpoint'),
       headers: {'Content-Type': 'application/json'},
@@ -42,8 +51,7 @@ class HttpHelper {
   }
 
   // http response handler
-  static Map<String, dynamic>? _responseHandler(http.Response response) {  
-
+  static Map<String, dynamic>? _responseHandler(http.Response response) {
     switch (response.statusCode) {
       case 200: // OK
         return json.decode(response.body);
