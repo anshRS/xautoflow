@@ -1,6 +1,7 @@
 import 'package:client/common/widgets/custom_button.dart';
 import 'package:client/common/widgets/custom_snackbar.dart';
 import 'package:client/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:client/features/home/presentation/screens/home_screen.dart';
 import 'package:client/features/auth/presentation/screens/signup_screen.dart';
 import 'package:client/features/auth/presentation/widgets/auth_form_field.dart';
 import 'package:client/utils/validators/validation.dart';
@@ -56,6 +57,15 @@ class _SignUpScreenState extends State<LogInScreen> {
                     CustomPopUp.errorSnackBar(
                       context: context,
                       message: state.message,
+                    );
+                  }
+
+                  if (state is AuthLoginSuccessState) {
+                    context.read<AuthBloc>().add(AuthStopLoadingEvent());
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      HomeScreen.route(),
+                      (route) => false,
                     );
                   }
                 },

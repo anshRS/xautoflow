@@ -69,6 +69,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           'Your account has been created! Please Check your inbox and verify your mail.',
                     );
 
+                    context.read<AuthBloc>().add(AuthStopLoadingEvent());
+
                     // Redirect to Verify Email Screen
                     Navigator.push(
                       context,
