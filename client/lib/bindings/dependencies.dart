@@ -1,4 +1,5 @@
 import 'package:client/bindings/auth_dependencies.dart';
+import 'package:client/bindings/profile_dependencies.dart';
 import 'package:client/common/cubits/app_user/app_user_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,4 +15,5 @@ Future<void> initDependencies() async {
   serviceLocator.registerLazySingleton(() => AppUserCubit());
 
   initAuthDependencies();
+  initProfileDependencies();
 }
