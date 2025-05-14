@@ -35,11 +35,34 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(context, ProfileScreen.route());
+          BlocBuilder<AppUserCubit, AppUserState>(
+            builder: (context, state) {
+              Widget avatarWidget;
+
+              if (state is AppUserLoggedIn && state.user.avatarUrl.isNotEmpty) {
+                avatarWidget = CircleAvatar(
+                  backgroundImage: NetworkImage(state.user.avatarUrl),
+                  backgroundColor: Colors.transparent,
+                );
+              } else if (state is AppUserLoggedIn) {
+                avatarWidget = CircleAvatar(
+                  backgroundColor: Colors.blueGrey,
+                  child: Text(
+                    state.user.name[0].toUpperCase(),
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+              } else {
+                avatarWidget = Icon(Icons.account_circle);
+              }
+
+              return IconButton(
+                onPressed: () {
+                  Navigator.push(context, ProfileScreen.route());
+                },
+                icon: avatarWidget,
+              );
             },
-            icon: Icon(Icons.account_circle),
           ),
         ],
       ),
