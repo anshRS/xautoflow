@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:client/utils/error/errors.dart';
 import 'package:client/utils/error/exceptions.dart';
 import 'package:http/http.dart' as http;
@@ -47,6 +48,31 @@ class HttpHelper {
 
   static Future<Map<String, dynamic>?> delete(String endpoint) async {
     final response = await http.delete(Uri.parse('$_baseUrl/$endpoint'));
+    return _responseHandler(response);
+  }
+
+  static Future<Map<String, dynamic>?> multipartPost(
+    String endpoint, {
+      required Map<String, String> fields,
+      File? file,
+      Map<String, String>? headers,
+    }
+  ) async {
+    var request = http.MultipartRequest('POST', Uri.parse('$_baseUrl/$endpoint'));
+
+    if(headers != null) {
+      request.headers.addAll(headers);
+    }
+
+    request.fields.addAll(fields);
+
+    if(file != null) {
+      request.files.add(await http.MultipartFile.fromPath('avatar', file.path));
+    }
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
     return _responseHandler(response);
   }
 
