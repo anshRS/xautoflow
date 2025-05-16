@@ -1,6 +1,7 @@
 import 'package:client/common/widgets/custom_button.dart';
 import 'package:client/common/widgets/custom_snackbar.dart';
 import 'package:client/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:client/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:client/features/home/presentation/screens/home_screen.dart';
 import 'package:client/features/auth/presentation/screens/signup_screen.dart';
 import 'package:client/features/auth/presentation/widgets/auth_form_field.dart';
@@ -96,7 +97,7 @@ class _SignUpScreenState extends State<LogInScreen> {
 
                         Flex(
                           direction: Axis.vertical,
-                          spacing: 16,
+                          // spacing: 16,
                           children: [
                             AuthFormField(
                               label: "Email",
@@ -107,6 +108,7 @@ class _SignUpScreenState extends State<LogInScreen> {
                               validator:
                                   (value) => Validator.validateEmail(value),
                             ),
+                            const SizedBox(height: 16),
                             AuthFormField(
                               label: "Password",
                               hintText: "Enter you password",
@@ -118,6 +120,35 @@ class _SignUpScreenState extends State<LogInScreen> {
                                     'Password',
                                     value,
                                   ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      ForgotPasswordScreen.route(),
+                                    );
+                                  },
+                                  child: Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: "Forgot Password? ",
+                                          style: theme.textTheme.bodyLarge
+                                              ?.copyWith(
+                                                color:
+                                                    theme
+                                                        .colorScheme
+                                                        .onSurfaceVariant,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
