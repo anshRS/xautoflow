@@ -1,4 +1,5 @@
 import 'package:client/common/cubits/app_user/app_user_cubit.dart';
+import 'package:client/features/home/presentation/widgets/agent.dart';
 import 'package:client/features/profile/presentation/screens/profile_screen.dart';
 import 'package:client/features/home/presentation/widgets/custom_drawer.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +73,50 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
+          const SizedBox(height: 16),
+          Text(
+            "Features",
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              children: [
+                Agent(
+                  agentName: "RealTime Chat",
+                  icon: Icon(Icons.smart_toy_outlined),
+                  description: "Facilitates instant, dynamic conversations",
+                  onTap: () {},
+                ),
+                Agent(
+                  agentName: "Finance",
+                  icon: Icon(Icons.query_stats),
+                  description:
+                      "Smart financial insights and analysis for better decisions",
+                  onTap: () {},
+                ),
+                Agent(
+                  agentName: "Emailing",
+                  icon: Icon(Icons.email_outlined),
+                  description: "Automated email for seamless communication",
+                  onTap: () {},
+                ),
+                Agent(
+                  agentName: "Coding",
+                  icon: Icon(Icons.code),
+                  description: "Intelligent code generation faster development",
+                  onTap: () {},
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
         ],
       ),
     );
