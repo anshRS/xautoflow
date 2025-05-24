@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 
 class PromptInputField extends StatefulWidget {
   final void Function(String) onSend;
+  final bool isTyping;
 
-  const PromptInputField({super.key, required this.onSend});
+  const PromptInputField({
+    super.key,
+    required this.onSend,
+    required this.isTyping,
+  });
 
   @override
   State<PromptInputField> createState() => _PromptInputFieldState();
@@ -55,6 +60,7 @@ class _PromptInputFieldState extends State<PromptInputField> {
                     Expanded(
                       child: TextField(
                         controller: _controller,
+                        enabled: !widget.isTyping,
                         decoration: const InputDecoration(
                           hintText: 'Type something here...',
                           border: InputBorder.none,
@@ -67,7 +73,7 @@ class _PromptInputFieldState extends State<PromptInputField> {
                       height: 48,
                       child: IconButton(
                         icon: const Icon(Icons.send),
-                        onPressed: _submit,
+                        onPressed: widget.isTyping ? null : _submit,
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:markdown_widget/config/all.dart';
+import 'package:markdown_widget/widget/all.dart';
 
 class MessageBubble extends StatelessWidget {
   final String text;
@@ -10,7 +12,6 @@ class MessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // final alignment = isBot ? CrossAxisAlignment.start : CrossAxisAlignment.end;
     final bgColor =
         isBot
             ? theme.colorScheme.surfaceContainerHighest
@@ -38,7 +39,6 @@ class MessageBubble extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: SingleChildScrollView(
         child: Column(
-          // crossAxisAlignment: alignment,
           children: [
             Row(
               mainAxisAlignment:
@@ -58,13 +58,20 @@ class MessageBubble extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
-                      vertical: 16,
+                      vertical: 8,
                     ),
                     decoration: BoxDecoration(
                       color: bgColor,
                       borderRadius: radius,
                     ),
-                    child: Text(text, style: TextStyle(color: fgColor)),
+                    // child: Text(text, style: TextStyle(color: fgColor)),
+                    child: MarkdownBlock(data: text, config: MarkdownConfig(
+                      configs: [
+                        PConfig(textStyle: theme.textTheme.bodyMedium!.copyWith(
+                          color: fgColor
+                        ))
+                      ]
+                    ),)
                   ),
                 ),
               ],

@@ -1,7 +1,10 @@
+import 'package:client/common/cubits/app_user/app_user_cubit.dart';
+import 'package:client/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:client/features/chat/presentation/widgets/message_bubble.dart';
 import 'package:client/features/chat/presentation/widgets/prompt_input_field.dart';
 import 'package:client/features/chat/presentation/widgets/typing_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ChatScreen extends StatefulWidget {
   static route() => MaterialPageRoute(builder: (context) => const ChatScreen());
@@ -13,58 +16,57 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final List<Map<String, dynamic>> _messages = [
-    {'text': 'Hello!', 'isBot': false},
-    {'text': 'Hi there, how can I help you today?', 'isBot': true},
-    {'text': 'Tell me a joke.', 'isBot': false},
-    {'text': 'Why don’t scientists trust atoms? Because they make up everything.', 'isBot': true},
-  ];
+  late ChatBloc _chatBloc;
 
-  bool _isBotTyping = false;
+  @override
+  void initState() {
+    super.initState();
 
-  void _handleSend(String text) {
-    setState(() {
-      _messages.insert(0, {'text': text, 'isBot': false});
-      _isBotTyping = true;
-    });
+    final user = (context.read<AppUserCubit>().state as AppUserLoggedIn).user;    
+    context.read<ChatBloc>().add(ConnectChatEvent(user.id));
+  }
 
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        _messages.insert(0, {'text': 'Mock bot reply to "$text"', 'isBot': true});
-        _isBotTyping = false;
-      });
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _chatBloc = context.read<ChatBloc>();
+  }
+
+  @override
+  void dispose() {
+    _chatBloc.add(DisconnectChatEvent());
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Realtime Chat'),
-        
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              reverse: true,
-              itemCount: _messages.length + (_isBotTyping ? 1 : 0),
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              itemBuilder: (context, index) {
-                if (_isBotTyping && index == 0) {
-                  return const TypingIndicator();
-                }
-
-                final message = _messages[_isBotTyping ? index - 1 : index];                
-                return MessageBubble(
-                  text: message['text'],
-                  isBot: message['isBot'],
-                );
-              },
-            ),
-          ),
-          PromptInputField(onSend: _handleSend),
-        ],
+      appBar: AppBar(title: const Text('Realtime Chat')),
+      body: BlocBuilder<ChatBloc, ChatState>(
+        builder: (context, state) {
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  reverse: true,
+                  itemCount: state.messages.length,
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  itemBuilder: (context, index) {
+                    final message = state.messages[index];
+                    return MessageBubble(text: message.data, isBot: message.isBot!);
+                  },
+                ),
+              ),
+              if (state.isTyping) TypingIndicator(),
+              PromptInputField(
+                isTyping: state.isTyping,
+                onSend: (text) {
+                  context.read<ChatBloc>().add(SendMessageEvent(text));
+                },
+              ),
+            ],
+          );
+        },
       ),
     );
   }
