@@ -9,5 +9,6 @@ class Settings:
     SUPABASE_KEY: str = os.getenv("SUPABASE_KEY")
     SUPABASE_JWT_SECRET: str = os.getenv("SUPABASE_JWT_SECRET")
     REDIRECT_URL: str = os.getenv("REDIRECT_URL")
+    BACKEND_URL: str = os.getenv("BACKEND_URL")
 
 settings = Settings()
