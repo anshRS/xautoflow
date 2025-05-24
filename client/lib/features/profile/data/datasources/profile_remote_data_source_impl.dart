@@ -22,7 +22,6 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
 
       return ProfileModel.fromJson(response!["data"][0]);
     } catch (e) {
-      print(e);
       rethrow;
     }
   }

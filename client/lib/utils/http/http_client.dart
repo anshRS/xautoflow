@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:client/utils/error/errors.dart';
 import 'package:client/utils/error/exceptions.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
-class HttpHelper {
-  // Backend API base URL
-  static const String _baseUrl = 'http://10.0.2.2:8000';
+// Backend API base URL
+final _baseUrl = dotenv.env['BACKEND_URL'];
 
+class HttpHelper { 
+    
   // GET http method
   static Future<Map<String, dynamic>?> get(
     String endpoint, {
