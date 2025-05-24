@@ -2,13 +2,16 @@ import 'package:client/bindings/dependencies.dart';
 import 'package:client/common/cubits/app_user/app_user_cubit.dart';
 import 'package:client/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:client/features/auth/presentation/screens/login_screen.dart';
+import 'package:client/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:client/features/home/presentation/screens/home_screen.dart';
 import 'package:client/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
   await initDependencies();
 
   runApp(
@@ -17,6 +20,7 @@ void main() async {
         BlocProvider(create: (_) => serviceLocator<AppUserCubit>()),
         BlocProvider(create: (_) => serviceLocator<AuthBloc>()),
         BlocProvider(create: (_) => serviceLocator<ProfileBloc>()),
+        BlocProvider(create: (_) => serviceLocator<ChatBloc>())
       ],
       child: const MyApp(),
     ),
