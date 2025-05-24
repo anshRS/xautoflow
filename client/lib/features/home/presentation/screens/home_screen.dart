@@ -1,4 +1,6 @@
 import 'package:client/common/cubits/app_user/app_user_cubit.dart';
+import 'package:client/common/widgets/animated_navigation.dart';
+import 'package:client/features/chat/presentation/screens/chat_screen.dart';
 import 'package:client/features/home/presentation/widgets/agent.dart';
 import 'package:client/features/profile/presentation/screens/profile_screen.dart';
 import 'package:client/features/home/presentation/widgets/custom_drawer.dart';
@@ -115,7 +117,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   agentName: "RealTime Chat",
                   icon: Icon(Icons.smart_toy_outlined),
                   description: "Facilitates instant, dynamic conversations",
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(context, bounceSlideUpRoute(const ChatScreen()));
+                  },
                 ),
                 Agent(
                   agentName: "Finance",

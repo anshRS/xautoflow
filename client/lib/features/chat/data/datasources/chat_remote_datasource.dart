@@ -14,7 +14,7 @@ class ChatRemoteDatasource {
   ChatRemoteDatasource();
 
   Future<void> connect(String userId) async {
-    _socket ??= WebSocket(Uri.parse('$_baseUrl/code/$userId'));
+    _socket ??= WebSocket(Uri.parse('$_baseUrl/chat/$userId'));
   }
 
   void sendMessage(String query) {
