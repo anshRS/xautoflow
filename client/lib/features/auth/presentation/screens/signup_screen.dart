@@ -45,7 +45,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             children: [
               // Image section
               SizedBox(
-                height: 460,
+                // height: 460,
+                height: MediaQuery.of(context).size.height * 0.5,
                 child: Image.asset(
                   'assets/images/signup_image.png',
                   fit: BoxFit.cover,

@@ -1,8 +1,8 @@
 import 'package:client/common/cubits/app_user/app_user_cubit.dart';
+import 'package:client/common/widgets/message_bubble.dart';
+import 'package:client/common/widgets/prompt_input_field.dart';
+import 'package:client/common/widgets/typing_indicator.dart';
 import 'package:client/features/chat/presentation/bloc/chat_bloc.dart';
-import 'package:client/features/chat/presentation/widgets/message_bubble.dart';
-import 'package:client/features/chat/presentation/widgets/prompt_input_field.dart';
-import 'package:client/features/chat/presentation/widgets/typing_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
